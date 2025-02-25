@@ -67,12 +67,12 @@ export function Avatar() {
   }, []);
 
   const handleGenerateAvatar = () => {
-    if (!selectedAvatarId || !selectedVoiceId) {
+    if (!selectedAvatarId || !selectedVoiceId || !transcript) {
       alert("Please select an avatar and a voice!");
       return;
     }
     setIsGenerating(true);
-    generateVideo("Hello. how are you?", selectedAvatarId, selectedVoiceId)
+    generateVideo(transcript, selectedAvatarId, selectedVoiceId)
       .then((res: any) => {
         if (res?.status === 200) {
           setGeneratedVideoUrl(res.data);
