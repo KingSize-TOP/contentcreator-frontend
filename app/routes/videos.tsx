@@ -1,5 +1,5 @@
+import { Videos } from "~/videos/videos";
 import type { Route } from "./+types/home";
-import { Home } from "../home/home";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,6 +8,6 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function HomeRouter() {
-  return <Home />;
+export default function VideosRouter() {
+  return <Videos />;
 }
