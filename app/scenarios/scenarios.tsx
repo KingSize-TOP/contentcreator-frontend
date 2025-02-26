@@ -38,7 +38,7 @@ export function Scenarios() {
   const handleGenerateText = () => {
     if (transcript.length > 0) {
       setGenerating(true);
-      generateText(transcript)
+      generateText(transcript.substring(0, 650))
         .then((res: any) => {
           if (res?.status === 200) {
             setGeneratedText(res?.data);
