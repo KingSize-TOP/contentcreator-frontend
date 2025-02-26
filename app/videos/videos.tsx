@@ -6,6 +6,17 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
 import { getVideos } from "~/services/services";
 
+// Utility function to format numbers
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + "M"; // Convert to "M" for millions
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + "K"; // Convert to "K" for thousands
+  }
+  return num.toString(); // Return as-is if less than 1000
+};
+
 export function Videos() {
   const navigate = useNavigate(); // Initialize the useNavigate hook
   const [searchParams] = useSearchParams(); // useSearchParams hook to get URL parameters
@@ -91,8 +102,9 @@ export function Videos() {
                 <div className="flex flex-col gap-2">
                   <Label className="line-clamp-2">{video.title}</Label>
                   <div className="flex gap-2">
-                    <Label>Views {video.views}</Label>
-                    <Label>Likes {video.likes}</Label>
+                    <Label>Views {formatNumber(video.views)}</Label>
+                    <Label>Likes {formatNumber(video.likes)}</Label>
+                    <Label>Duration {video.duration}</Label>
                   </div>
                 </div>
               </div>

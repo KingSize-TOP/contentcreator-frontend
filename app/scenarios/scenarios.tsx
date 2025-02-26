@@ -12,33 +12,45 @@ export function Scenarios() {
   const [transcript, setTranscript] = useState<string>("");
   const [generatedText, setGeneratedText] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generating, setGenerating] = useState<boolean>(false);
 
   useEffect(() => {
     if (video_id) {
-      // getTranscript(video_id)
-      //   .then((res: any) => {
-      //     if (res?.status === 200) {
-      //       setTranscript(res?.data);
-      //     }
-      //   })
-      //   .catch((err: any) => {
-      //     console.log("Error");
-      //   });
-      setTranscript(`I've been spending millions of dollars trying to create the perfect diet. What I did is I asked all my organs of the body. Hey, heart liver and kidney, what do you need to be your best self? We looked at scientific evidence and this is the result a diet. Exactly mapped to produce 50, perfect biomarkers. My speed of Aging is currently slower than the average 10 year old. So let me show you what I do on a daily basis. When I wake up in the morning, I drink the Green Giant collagen peptides, cinnamon spermidine via chlorella powder. Amino acids, 57 pills. I didn't work out for 1 hour. I come back.
-Back inside, I have super veggie which is a few pounds of broccoli, cauliflower, mushrooms, black lentils, ginger and garlic extra virgin olive oil. I have a very special type and 100% dark chocolate, which is bitter. And I pair this with the vegetables 1 hour, later nutty pudding, which is macadamia nuts. Walnuts flax seeds, berries, sunflower lechin, pea protein, an additional roughly 40 pills. I'll have a third meal of the day which includes vegetables, berries and nuts. And some more olive. Oil altogether is 2,000 calories.`);
+      setLoading(true);
+      getTranscript(video_id)
+        .then((res: any) => {
+          if (res?.status === 200) {
+            setTranscript(res?.data);
+          }
+        })
+        .catch((err: any) => {
+          console.log("Error");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+      // setTranscript(`I've been spending millions of dollars trying to create the perfect diet. What I did is I asked all my organs of the body. Hey, heart liver and kidney, what do you need to be your best self? We looked at scientific evidence and this is the result a diet. Exactly mapped to produce 50, perfect biomarkers. My speed of Aging is currently slower than the average 10 year old. So let me show you what I do on a daily basis. When I wake up in the morning, I drink the Green Giant collagen peptides, cinnamon spermidine via chlorella powder. Amino acids, 57 pills. I didn't work out for 1 hour. I come back.
+      // Back inside, I have super veggie which is a few pounds of broccoli, cauliflower, mushrooms, black lentils, ginger and garlic extra virgin olive oil. I have a very special type and 100% dark chocolate, which is bitter. And I pair this with the vegetables 1 hour, later nutty pudding, which is macadamia nuts. Walnuts flax seeds, berries, sunflower lechin, pea protein, an additional roughly 40 pills. I'll have a third meal of the day which includes vegetables, berries and nuts. And some more olive. Oil altogether is 2,000 calories.`);
     }
   }, [video_id]);
 
   const handleGenerateText = () => {
-    generateText(transcript)
-      .then((res: any) => {
-        if (res?.status === 200) {
-          setGeneratedText(res?.data);
-        }
-      })
-      .catch((err: any) => {
-        console.log("Error");
-      });
+    if (transcript.length > 0) {
+      setGenerating(true);
+      generateText(transcript)
+        .then((res: any) => {
+          if (res?.status === 200) {
+            setGeneratedText(res?.data);
+          }
+        })
+        .catch((err: any) => {
+          console.log("Error");
+        })
+        .finally(() => {
+          setGenerating(false); // Set loading to false after the fetch is complete
+        });
+    }
   };
 
   const handlePrev = () => {
@@ -60,7 +72,7 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
 
   return (
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
-      <div className="flex flex-col gap-4 min-h-0 max-w-[360px] h-full">
+      <div className="flex flex-col gap-4 min-h-0 w-full max-w-md h-full px-4">
         {/* Input Section */}
         <Label className="self-center text-2xl">Scenarios</Label>
 
@@ -69,71 +81,55 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
             <div
               className={`${
                 selectedIndex === 0 ? "bg-[#666]" : "bg-[#eee]"
-              } h-40 px-4 py-2`}
+              } h-40 px-4 py-2 flex items-center justify-center`}
               onClick={() => setSelectedIndex(0)}
             >
-              <Label
-                className={`line-clamp-10 ${
-                  selectedIndex === 0 ? "text-white" : "text-black"
-                }`}
-              >
-                {transcript}
-              </Label>
+              {loading ? (
+                // Show loading indicator when loading
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                </div>
+              ) : (
+                // Show transcript when loading is complete
+                <Label
+                  className={`line-clamp-10 ${
+                    selectedIndex === 0 ? "text-white" : "text-black"
+                  }`}
+                >
+                  {transcript || "No transcript available"}
+                </Label>
+              )}
             </div>
             <Button
               className="w-full mt-4"
               onClick={() => handleGenerateText()}
+              disabled={generating}
             >
-              Generate Text
+              {generating ? "Loading..." : "Generate Text"}
             </Button>
-            <div
-              className={`${
-                selectedIndex === 1 ? "bg-[#666]" : "bg-[#eee]"
-              } h-40 px-4 py-2 mt-4`}
-              onClick={() => setSelectedIndex(1)}
-            >
-              {generatedText.length > 0 && (
-                <Label
-                  className={`line-clamp-10 ${
-                    selectedIndex === 1 ? "text-white" : "text-black"
-                  }`}
-                >
-                  {generatedText[0]}
-                </Label>
-              )}
-            </div>
-            <div
-              className={`${
-                selectedIndex === 2 ? "bg-[#666]" : "bg-[#eee]"
-              } h-40 px-4 py-2 mt-4`}
-              onClick={() => setSelectedIndex(2)}
-            >
-              {generatedText.length > 0 && (
-                <Label
-                  className={`line-clamp-10 ${
-                    selectedIndex === 2 ? "text-white" : "text-black"
-                  }`}
-                >
-                  {generatedText[1]}
-                </Label>
-              )}
-            </div>
-            <div
-              className={`${
-                selectedIndex === 3 ? "bg-[#666]" : "bg-[#eee]"
-              } h-40 px-4 py-2 mt-4`}
-              onClick={() => setSelectedIndex(3)}
-            >
-              {generatedText.length > 0 && (
-                <Label
-                  className={`line-clamp-10 ${
-                    selectedIndex === 3 ? "text-white" : "text-black"
-                  }`}
-                >
-                  {generatedText[2]}
-                </Label>
-              )}
-            </div>
+            {[0, 1, 2].map((index) => (
+              <div
+                key={index}
+                className={`${
+                  selectedIndex === index + 1 ? "bg-[#666]" : "bg-[#eee]"
+                } min-h-[160px] max-h-[320px] px-4 py-2 mt-4 flex items-center justify-center`}
+                onClick={() => setSelectedIndex(index + 1)}
+              >
+                {generating ? (
+                  // Show spinner when generating
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                ) : (
+                  // Show generated text (if available) when done
+                  <Label
+                    className={`line-clamp-10 ${
+                      selectedIndex === index + 1 ? "text-white" : "text-black"
+                    }`}
+                  >
+                    {generatedText[index] || "No text generated yet"}
+                  </Label>
+                )}
+              </div>
+            ))}
           </ScrollArea>
         </div>
 

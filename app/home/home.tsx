@@ -28,9 +28,40 @@ export function Home() {
     }
   }, [profileLinks]);
 
+  // Helper function to normalize the URL
+  const normalizeYouTubeUrl = (url: string): string => {
+    try {
+      const parsedUrl = new URL(url);
+
+      // Ensure the base URL is always "https://www.youtube.com"
+      if (
+        parsedUrl.hostname === "youtube.com" ||
+        parsedUrl.hostname === "www.youtube.com"
+      ) {
+        parsedUrl.hostname = "www.youtube.com";
+      }
+
+      // Remove any query parameters or fragments
+      return parsedUrl.origin + parsedUrl.pathname;
+    } catch (err) {
+      // If the input is not a valid URL, log an error and return an empty string
+      console.error("Invalid URL:", url);
+      return "";
+    }
+  };
+
   const handleAddProfileLink = () => {
     if (profileLink.trim() !== "") {
-      setProfileLinks((prev) => [...prev, profileLink]); // Add the new profile link
+      const normalizedLink = normalizeYouTubeUrl(profileLink.trim()); // Normalize the link
+      if (normalizedLink) {
+        if (!profileLinks.includes(normalizedLink)) {
+          setProfileLinks((prev) => [...prev, normalizedLink]); // Add only if it's not already in the list
+        } else {
+          alert("This profile link is already in the list.");
+        }
+      } else {
+        alert("Invalid YouTube profile link. Please check and try again.");
+      }
       setProfileLink(""); // Clear the input field after adding
     }
   };
