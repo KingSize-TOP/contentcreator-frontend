@@ -76,7 +76,7 @@ export function Avatar() {
     generateVideo(transcript, selectedAvatarId, selectedVoiceId)
       .then((res: any) => {
         console.log(res);
-        const taskId = res.task_id;
+        const taskId = res.data.task_id;
         pollTaskStatus(taskId);
       })
       .catch((err: any) => {
@@ -90,12 +90,12 @@ export function Avatar() {
     const interval = setInterval(() => {
       getTaskStatus(taskId)
         .then((statusRes: any) => {
-          if (statusRes.status === "completed") {
-            setGeneratedVideoUrl(statusRes.video_url); // Video is ready
+          if (statusRes.data.status === "completed") {
+            setGeneratedVideoUrl(statusRes.data.video_url); // Video is ready
             clearInterval(interval);
             setIsGenerating(false);
-          } else if (statusRes.status === "failed") {
-            alert(`Video generation failed: ${statusRes.error}`);
+          } else if (statusRes.data.status === "failed") {
+            alert(`Video generation failed: ${statusRes.data.error}`);
             clearInterval(interval);
             setIsGenerating(false);
           }
