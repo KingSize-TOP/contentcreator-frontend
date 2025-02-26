@@ -1,4 +1,4 @@
-import { getApi } from "./apis";
+import { getApi, postApi } from "./apis";
 
 export const getVideos = (link: string, offset: number, limit: number) =>
   getApi(`/videos?profile_url=${link}&offset=${offset}&limit=${limit}`);
@@ -11,8 +11,8 @@ export const generateVideo = (
   avatar_id: string,
   voice_id: string
 ) =>
-  getApi(
-    `/generate_video?text=${text}&avatar_id=${avatar_id}&voice_id=${voice_id}`
+  postApi(
+    "/generate_video", {text, avatar_id, voice_id}
   );
 export const getAvatarList = () => getApi("/avatar_list");
 export const getVoiceList = () => getApi("/voice_list");
