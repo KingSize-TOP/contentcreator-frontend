@@ -1,13 +1,11 @@
-import { Video } from "lucide-react";
 import { useEffect, useState } from "react";
+import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import ReactPlayer from "react-player";
 import {
   generateVideo,
   getAvatarList,
-  getTaskStatus,
   getVoiceList,
 } from "~/services/services";
 
@@ -76,36 +74,19 @@ export function Avatar() {
     generateVideo(transcript, selectedAvatarId, selectedVoiceId)
       .then((res: any) => {
         console.log(res);
-        const taskId = res.task_id;
-        pollTaskStatus(taskId);
+        if (res?.status === 200) {
+          setGeneratedVideoUrl(res.data);
+        } else {
+          alert("Failed to generate video. Please try again.");
+        }
       })
       .catch((err: any) => {
-        console.error("Error starting video generation:", err);
-        alert("Failed to start video generation.");
-        setIsGenerating(false);
+        console.error("Error generating avatar:", err);
+        alert("Something went wrong while generating the video.");
+      })
+      .finally(() => {
+        setIsGenerating(false); // Set loading to false after generation
       });
-  };
-
-  const pollTaskStatus = (taskId: string) => {
-    const interval = setInterval(() => {
-      getTaskStatus(taskId)
-        .then((statusRes: any) => {
-          if (statusRes.status === "completed") {
-            setGeneratedVideoUrl(statusRes.video_url); // Video is ready
-            clearInterval(interval);
-            setIsGenerating(false);
-          } else if (statusRes.status === "failed") {
-            alert(`Video generation failed: ${statusRes.error}`);
-            clearInterval(interval);
-            setIsGenerating(false);
-          }
-        })
-        .catch((err: any) => {
-          console.error("Error checking task status:", err);
-          clearInterval(interval);
-          setIsGenerating(false);
-        });
-    }, 5000); // Poll every 5 seconds
   };
 
   // Handle avatar selection

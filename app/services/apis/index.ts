@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from './config';
 
 const buildApiUrl = (url: any) => `${config.protocol}://${config.serverURL}${url}`;
-
+axios.defaults.timeout = 600000;
 export const postApi = async (url: string, data: any) => {
   try {
     let apiUrl = buildApiUrl(url);
