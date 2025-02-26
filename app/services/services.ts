@@ -13,6 +13,6 @@ export const generateVideo = (
 ) => postApi("/generate_video", { text, avatar_id, voice_id });
 export const getAvatarList = () => getApi("/avatar_list");
 export const getVoiceList = () => getApi("/voice_list");
-// export const getTaskStatus = (taskId: string) => {
-//   return getApi(`/task_status/${taskId}`);
-// };
+export const getTaskStatus = (taskId: string) => {
+  return getApi(`/task_status/${taskId}`);
+};
