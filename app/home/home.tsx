@@ -32,6 +32,12 @@ export function Home() {
     try {
       const parsedUrl = new URL(url);
 
+      // Handle "youtu.be" shortened URLs
+      if (parsedUrl.hostname === "youtu.be") {
+        const videoId = parsedUrl.pathname.substring(1); // Extract video ID from pathname
+        return `https://www.youtube.com/watch?v=${videoId}`; // Convert to full YouTube URL
+      }
+
       // Normalize hostname to "www.youtube.com"
       if (
         parsedUrl.hostname === "youtube.com" ||
@@ -98,7 +104,7 @@ export function Home() {
         navigate(`/videos?link=${encodeURIComponent(selectedLink)}`);
       }
     } else {
-      alert("Please select a profile link before proceeding.");
+      alert("Please select a link before proceeding.");
     }
   };
 
@@ -106,12 +112,12 @@ export function Home() {
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
       <div className="flex flex-col gap-4 min-h-0 max-w-[360px] h-full">
         {/* Input Section */}
-        <Label className="self-center text-2xl">Profile Links</Label>
+        <Label className="self-center text-2xl">Links</Label>
         <div className="flex gap-2">
           <Input
             className="w-[340px]"
             type="text"
-            placeholder="Enter your profile link"
+            placeholder="Enter your link"
             value={profileLink}
             onChange={(e) => setProfileLink(e.target.value)}
           />
