@@ -1,9 +1,8 @@
-import { Video } from "lucide-react";
 import { useEffect, useState } from "react";
+import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import ReactPlayer from "react-player";
 import {
   generateVideo,
   getAvatarList,
