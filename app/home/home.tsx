@@ -28,12 +28,11 @@ export function Home() {
     }
   }, [profileLinks]);
 
-  // Helper function to normalize the URL
   const normalizeYouTubeUrl = (url: string): string => {
     try {
       const parsedUrl = new URL(url);
 
-      // Ensure the base URL is always "https://www.youtube.com"
+      // Normalize hostname to "www.youtube.com"
       if (
         parsedUrl.hostname === "youtube.com" ||
         parsedUrl.hostname === "www.youtube.com"
@@ -41,12 +40,26 @@ export function Home() {
         parsedUrl.hostname = "www.youtube.com";
       }
 
-      // Remove any query parameters or fragments
-      return parsedUrl.origin + parsedUrl.pathname;
+      // If it's a YouTube handle/profile URL (e.g., starts with "/@"), remove query parameters
+      if (parsedUrl.pathname.startsWith("/@")) {
+        return parsedUrl.origin + parsedUrl.pathname; // Exclude query parameters
+      }
+
+      // For all other types of YouTube URLs, preserve query parameters
+      return parsedUrl.origin + parsedUrl.pathname + parsedUrl.search;
     } catch (err) {
-      // If the input is not a valid URL, log an error and return an empty string
       console.error("Invalid URL:", url);
       return "";
+    }
+  };
+
+  const getVideoIdFromUrl = (url: string): string | null => {
+    try {
+      const parsedUrl = new URL(url); // Parse the URL
+      return parsedUrl.searchParams.get("v"); // Get the 'v' query parameter
+    } catch (err) {
+      console.error("Invalid URL:", url); // Log an error if the URL is invalid
+      return null;
     }
   };
 
@@ -76,7 +89,14 @@ export function Home() {
   const handleNext = () => {
     if (selectedIndex !== -1) {
       const selectedLink = profileLinks[selectedIndex];
-      navigate(`/videos?link=${encodeURIComponent(selectedLink)}`);
+      if (selectedLink.includes("watch?")) {
+        const videoId = getVideoIdFromUrl(selectedLink);
+        if (videoId !== null) {
+          navigate(`/scenarios?video_id=${videoId}`);
+        }
+      } else {
+        navigate(`/videos?link=${encodeURIComponent(selectedLink)}`);
+      }
     } else {
       alert("Please select a profile link before proceeding.");
     }

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
-import { getVideos } from "~/services/services";
+import { getShortVideos, getVideos } from "~/services/services";
 
 // Utility function to format numbers
 const formatNumber = (num: number): string => {
@@ -26,25 +27,27 @@ export function Videos() {
   const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState(true);
+  const [showShorts, setShowShorts] = useState(false); // State for "Short" checkbox
 
   useEffect(() => {
     // Fetch initial videos on component mount
-    fetchVideos(0);
-  }, []);
+    fetchVideos(0, showShorts);
+  }, [showShorts]);
 
-  const fetchVideos = (currentOffset: number) => {
+  const fetchVideos = (currentOffset: number, isShort: boolean) => {
     if (linkParam) {
       setLoading(true);
-      getVideos(linkParam, currentOffset, 5)
+      const fetchFunction = isShort ? getShortVideos : getVideos; // Decide API to call
+      fetchFunction(linkParam, currentOffset, 5)
         .then((res: any) => {
           if (res?.status === 200) {
-            setVideos((prevVideos) => [...prevVideos, ...res.data.videos]);
+            setVideos((prevVideos) => (currentOffset === 0 ? res.data.videos : [...prevVideos, ...res.data.videos])); // Reset if fetching from 0
             setOffset(res.data.next_offset || 0);
             setHasMore(res.data.next_offset !== null);
           }
         })
         .catch((err: any) => {
-          console.log("Error");
+          console.log("Error fetching videos:", err);
         })
         .finally(() => {
           setLoading(false);
@@ -58,7 +61,7 @@ export function Videos() {
 
   const handleLoadMore = () => {
     if (hasMore) {
-      fetchVideos(offset); // Fetch the next batch of videos
+      fetchVideos(offset, showShorts); // Fetch the next batch of videos
     }
   };
 
@@ -74,12 +77,29 @@ export function Videos() {
       alert("Please select a video before proceeding.");
     }
   };
+  
+  const handleCheckboxChange = (checked: boolean) => {
+    setShowShorts(checked); // Update state for "Short" checkbox
+    setVideos([]); // Reset the videos list when toggling between short and normal videos
+    setOffset(0); // Reset the offset
+  };
 
   return (
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
       <div className="flex flex-col gap-4 min-h-0 w-full h-full px-3">
         {/* Input Section */}
         <Label className="self-center text-2xl">Videos</Label>
+
+         {/* Checkbox for "Short" videos */}
+         <div className="flex items-center gap-2 self-center">
+          <Checkbox
+            id="short-videos"
+            checked={showShorts}
+            onCheckedChange={handleCheckboxChange}
+          />
+          <Label htmlFor="short-videos">Short Videos</Label>
+        </div>
+
 
         <div className="flex-1 min-h-0">
           <ScrollArea className="h-full w-full rounded-md border">
