@@ -5,7 +5,11 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
-import { getShortVideos, getVideos } from "~/services/services";
+import {
+  getInstagramVideos,
+  getShortVideos,
+  getVideos,
+} from "~/services/services";
 
 // Utility function to format numbers
 const formatNumber = (num: number): string => {
@@ -34,24 +38,74 @@ export function Videos() {
     fetchVideos(0, showShorts);
   }, [showShorts]);
 
+  const getVideoType = () => {
+    if (linkParam?.includes("youtube")) {
+      return "Youtube";
+    } else {
+      return "Instagram";
+    }
+  };
+
+  const getInstagramUsername = (url: string): string => {
+    try {
+      const parsedUrl = new URL(url); // Parse the URL
+      if (
+        parsedUrl.hostname === "instagram.com" ||
+        parsedUrl.hostname === "www.instagram.com"
+      ) {
+        const pathSegments = parsedUrl.pathname.split("/"); // Split the pathname by "/"
+        return pathSegments[1]; // The username is the first segment (after the leading "/")
+      }
+      return ""; // Return null if it's not an Instagram URL
+    } catch (err) {
+      console.error("Invalid URL:", url);
+      return ""; // Return null if the URL is invalid
+    }
+  };
+
   const fetchVideos = (currentOffset: number, isShort: boolean) => {
     if (linkParam) {
       setLoading(true);
-      const fetchFunction = isShort ? getShortVideos : getVideos; // Decide API to call
-      fetchFunction(linkParam, currentOffset, 5)
-        .then((res: any) => {
-          if (res?.status === 200) {
-            setVideos((prevVideos) => (currentOffset === 0 ? res.data.videos : [...prevVideos, ...res.data.videos])); // Reset if fetching from 0
-            setOffset(res.data.next_offset || 0);
-            setHasMore(res.data.next_offset !== null);
-          }
-        })
-        .catch((err: any) => {
-          console.log("Error fetching videos:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      if (getVideoType() === "Youtube") {
+        const fetchFunction = isShort ? getShortVideos : getVideos; // Decide API to call
+        fetchFunction(linkParam, currentOffset, 5)
+          .then((res: any) => {
+            if (res?.status === 200) {
+              setVideos((prevVideos) =>
+                currentOffset === 0
+                  ? res.data.videos
+                  : [...prevVideos, ...res.data.videos]
+              ); // Reset if fetching from 0
+              setOffset(res.data.next_offset || 0);
+              setHasMore(res.data.next_offset !== null);
+            }
+          })
+          .catch((err: any) => {
+            console.log("Error fetching videos:", err);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      } else {
+        getInstagramVideos(getInstagramUsername(linkParam), currentOffset, 5)
+          .then((res: any) => {
+            if (res?.status === 200) {
+              setVideos((prevVideos) =>
+                currentOffset === 0
+                  ? res.data
+                  : [...prevVideos, ...res.data]
+              ); // Reset if fetching from 0
+              setOffset(res.data.length);
+              setHasMore(res.data.length === 5);
+            }
+          })
+          .catch((err: any) => {
+            console.log("Error fetching videos:", err);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
     }
   };
 
@@ -77,7 +131,7 @@ export function Videos() {
       alert("Please select a video before proceeding.");
     }
   };
-  
+
   const handleCheckboxChange = (checked: boolean) => {
     setShowShorts(checked); // Update state for "Short" checkbox
     setVideos([]); // Reset the videos list when toggling between short and normal videos
@@ -90,8 +144,8 @@ export function Videos() {
         {/* Input Section */}
         <Label className="self-center text-2xl">Videos</Label>
 
-         {/* Checkbox for "Short" videos */}
-         <div className="flex items-center gap-2 self-center">
+        {/* Checkbox for "Short" videos */}
+        <div className="flex items-center gap-2 self-center">
           <Checkbox
             id="short-videos"
             checked={showShorts}
@@ -99,7 +153,6 @@ export function Videos() {
           />
           <Label htmlFor="short-videos">Short Videos</Label>
         </div>
-
 
         <div className="flex-1 min-h-0">
           <ScrollArea className="h-full w-full rounded-md border">

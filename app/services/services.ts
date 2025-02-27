@@ -18,3 +18,5 @@ export const getVoiceList = () => getApi("/voice_list");
 export const getTaskStatus = (taskId: string) => {
   return getApi(`/task_status/${taskId}`);
 };
+export const getInstagramVideos = (username: string, offset: number, limit: number) =>
+    getApi(`/insta_videos?username=${username}&offset=${offset}&limit=${limit}`);

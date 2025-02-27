@@ -28,9 +28,17 @@ export function Home() {
     }
   }, [profileLinks]);
 
-  const normalizeYouTubeUrl = (url: string): string => {
+  const normalizeUrl = (url: string): string => {
     try {
       const parsedUrl = new URL(url);
+
+      // Handle Instagram URLs, strip query parameters
+      if (
+        parsedUrl.hostname === "instagram.com" ||
+        parsedUrl.hostname === "www.instagram.com"
+      ) {
+        return parsedUrl.origin + parsedUrl.pathname; // Only keep the base URL (origin + pathname)
+      }
 
       // Handle "youtu.be" shortened URLs
       if (parsedUrl.hostname === "youtu.be") {
@@ -71,7 +79,7 @@ export function Home() {
 
   const handleAddProfileLink = () => {
     if (profileLink.trim() !== "") {
-      const normalizedLink = normalizeYouTubeUrl(profileLink.trim()); // Normalize the link
+      const normalizedLink = normalizeUrl(profileLink.trim()); // Normalize the link
       if (normalizedLink) {
         if (!profileLinks.includes(normalizedLink)) {
           setProfileLinks((prev) => [...prev, normalizedLink]); // Add only if it's not already in the list
