@@ -110,9 +110,13 @@ export function Videos() {
     }
   };
 
-  const openVideo = (video_id: string) => {
+  const openYoutubeVideo = (video_id: string) => {
     window.open(`https://www.youtube.com/watch?v=${video_id}`, "_blank");
   };
+
+  const openInstagramVideo = (url: string) => {
+    window.open(url, "_blank");
+  }
 
   const handleLoadMore = () => {
     if (hasMore) {
@@ -170,7 +174,11 @@ export function Videos() {
                   className="min-w-16 min-h-16 w-16 h-16 rounded-xl object-cover cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    openVideo(video.video_id);
+                    if (getVideoType() === "Youtube") {
+                      openYoutubeVideo(video.video_id);
+                    } else {
+                      openInstagramVideo(video.url);
+                    }
                   }}
                 />
                 <div className="flex flex-col gap-2">
