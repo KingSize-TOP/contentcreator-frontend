@@ -93,11 +93,11 @@ export function Videos() {
             if (res?.status === 200) {
               setVideos((prevVideos) =>
                 currentOffset === 0
-                  ? res.data
-                  : [...prevVideos, ...res.data]
+                  ? res.data.videos
+                  : [...prevVideos, ...res.data.videos]
               ); // Reset if fetching from 0
-              setOffset(currentOffset + 1);
-              setHasMore(res.data.length === 5);
+              setOffset(res.data.next_offset || 0);
+              setHasMore(res.data.next_offset !== null);
             }
           })
           .catch((err: any) => {
