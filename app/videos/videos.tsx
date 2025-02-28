@@ -131,7 +131,11 @@ export function Videos() {
   const handleNext = () => {
     if (selectedVideoIndex !== -1) {
       const selectedVideo = videos[selectedVideoIndex];
-      navigate(`/scenarios?video_id=${selectedVideo["video_id"]}`);
+      if (getVideoType() === 'Youtube') {
+        navigate(`/scenarios?type=Youtube&ref=${selectedVideo["video_id"]}`);
+      } else {
+        navigate(`/scenarios?type=Instagram&ref=${selectedVideo["url"]}`);
+      }
     } else {
       alert("Please select a video before proceeding.");
     }
