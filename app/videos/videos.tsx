@@ -134,7 +134,7 @@ export function Videos() {
       if (getVideoType() === 'Youtube') {
         navigate(`/scenarios?type=Youtube&ref=${selectedVideo["video_id"]}`);
       } else {
-        navigate(`/scenarios?type=Instagram&ref=${selectedVideo["url"]}`);
+        navigate(`/scenarios?type=Instagram&ref=${encodeURIComponent(selectedVideo["url"])}`);
       }
     } else {
       alert("Please select a video before proceeding.");
