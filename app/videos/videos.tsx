@@ -5,6 +5,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
+import config from "~/services/apis/config";
 import {
   getInstagramVideos,
   getShortVideos,
@@ -95,7 +96,7 @@ export function Videos() {
                   ? res.data
                   : [...prevVideos, ...res.data]
               ); // Reset if fetching from 0
-              setOffset(res.data.length);
+              setOffset(currentOffset + 1);
               setHasMore(res.data.length === 5);
             }
           })
@@ -165,8 +166,8 @@ export function Videos() {
                 onClick={(e) => setSelectedVideoIndex(index)}
               >
                 <img
-                  src={video.thumbnail}
-                  className="w-16 h-16 rounded-xl object-cover cursor-pointer"
+                  src={getVideoType() === 'Youtube' ? video.thumbnail:`${config.protocol}://${config.serverURL}/proxy-image?url=${encodeURIComponent(video.thumbnail)}`}
+                  className="min-w-16 min-h-16 w-16 h-16 rounded-xl object-cover cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     openVideo(video.video_id);
