@@ -40,7 +40,7 @@ export function Scenarios() {
         // Back inside, I have super veggie which is a few pounds of broccoli, cauliflower, mushrooms, black lentils, ginger and garlic extra virgin olive oil. I have a very special type and 100% dark chocolate, which is bitter. And I pair this with the vegetables 1 hour, later nutty pudding, which is macadamia nuts. Walnuts flax seeds, berries, sunflower lechin, pea protein, an additional roughly 40 pills. I'll have a third meal of the day which includes vegetables, berries and nuts. And some more olive. Oil altogether is 2,000 calories.`);
       } else {
         setLoading(true);
-        getInstaTranscript(ref)
+        getInstaTranscript(encodeURIComponent(ref))
           .then((res: any) => {
             if (res?.status === 200) {
               setTranscript(res?.data);
