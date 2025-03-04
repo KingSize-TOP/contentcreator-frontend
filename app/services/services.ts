@@ -24,5 +24,11 @@ export const getInstagramVideos = (
   limit: number
 ) =>
   getApi(`/insta_videos?username=${username}&offset=${offset}&limit=${limit}`);
+export const getInstagramShortVideos = (
+    username: string,
+    offset: number,
+    limit: number
+  ) =>
+    getApi(`/insta_short_videos?username=${username}&offset=${offset}&limit=${limit}`);
 export const getInstaTranscript = (url: string) =>
   getApi(`/insta_transcript?url=${url}`);

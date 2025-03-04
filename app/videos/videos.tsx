@@ -7,6 +7,7 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
 import config from "~/services/apis/config";
 import {
+  getInstagramShortVideos,
   getInstagramVideos,
   getShortVideos,
   getVideos,
@@ -88,7 +89,8 @@ export function Videos() {
             setLoading(false);
           });
       } else {
-        getInstagramVideos(getInstagramUsername(linkParam), currentOffset, 5)
+        const fetchFunction = isShort ? getInstagramShortVideos : getInstagramVideos; // Decide API to call
+        fetchFunction(getInstagramUsername(linkParam), currentOffset, 5)
           .then((res: any) => {
             if (res?.status === 200) {
               setVideos((prevVideos) =>
