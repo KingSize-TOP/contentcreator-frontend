@@ -17,6 +17,7 @@ export function Avatar() {
 
   const [avatarList, setAvatarList] = useState([]);
   const [voiceList, setVoiceList] = useState([]);
+  const [filteredVoiceList, setFilteredVoiceList] = useState([]); // Filtered list of voices
   const [isLoading, setIsLoading] = useState(true); // Loading while fetching avatars/voices
   const [isGenerating, setIsGenerating] = useState(false); // Loading while generating video
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(
@@ -27,6 +28,10 @@ export function Avatar() {
   const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null); // Selected voice
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null); // Playing video
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null); // Playing audio
+
+  // Filters
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
+  const [genderFilter, setGenderFilter] = useState<string>("all");
 
   useEffect(() => {
     // Set loading to true whenever fetching starts
@@ -50,11 +55,17 @@ export function Avatar() {
       getVoiceList()
         .then((res: any) => {
           if (res?.status === 200) {
-            const filteredVoices = res.data.filter(
-              (voice: any) =>
-                voice.language !== "unknown" && voice.gender !== "unknown"
-            );
+            const filteredVoices = res.data
+              .filter(
+                (voice: any) =>
+                  voice.language !== "unknown" && voice.gender !== "unknown"
+              )
+              .map((voice: any) => ({
+                ...voice,
+                gender: voice.gender.toLowerCase(), // Normalize gender to lowercase
+              }));
             setVoiceList(filteredVoices);
+            setFilteredVoiceList(filteredVoices); // Initially, show all voices
           }
         })
         .catch((err: any) => {
@@ -65,6 +76,23 @@ export function Avatar() {
       setIsLoading(false);
     });
   }, []);
+
+  // Update the filtered voices list whenever filters change
+  useEffect(() => {
+    let filtered = voiceList;
+
+    if (languageFilter !== "all") {
+      filtered = filtered.filter(
+        (voice: any) => voice.language === languageFilter
+      );
+    }
+
+    if (genderFilter !== "all") {
+      filtered = filtered.filter((voice: any) => voice.gender === genderFilter);
+    }
+
+    setFilteredVoiceList(filtered);
+  }, [languageFilter, genderFilter, voiceList]);
 
   const handleGenerateAvatar = () => {
     if (!selectedAvatarId || !selectedVoiceId || !transcript) {
@@ -209,8 +237,40 @@ export function Avatar() {
             {/* Voices Section */}
             <div className="mt-4">
               <Label className="text-lg">Voices</Label>
+              {/* Filters */}
+              <div className="flex gap-4 mb-3">
+                <select
+                  value={languageFilter}
+                  onChange={(e) => setLanguageFilter(e.target.value)}
+                  className="p-2 border rounded"
+                >
+                  <option value="all">All Languages</option>
+                  {[
+                    ...new Set(voiceList.map((voice: any) => voice.language)),
+                  ].map((language) => (
+                    <option key={language} value={language}>
+                      {language}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={genderFilter}
+                  onChange={(e) => setGenderFilter(e.target.value)}
+                  className="p-2 border rounded"
+                >
+                  <option value="all">All Genders</option>
+                  {[
+                    ...new Set(voiceList.map((voice: any) => voice.gender)),
+                  ].map((gender) => (
+                    <option key={gender} value={gender}>
+                      {gender}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-                {voiceList.map((voice: any) => (
+                {filteredVoiceList.map((voice: any) => (
                   <div
                     key={voice.voice_id}
                     className={`flex flex-col gap-2 p-2 border-b ${
