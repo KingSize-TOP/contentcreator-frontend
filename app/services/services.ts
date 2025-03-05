@@ -7,7 +7,7 @@ export const getShortVideos = (link: string, offset: number, limit: number) =>
 export const getTranscript = (video_id: string) =>
   getApi(`/transcript_video?video_id=${video_id}`);
 export const generateText = (transcription: string) =>
-  getApi(`/generate_text?transcription=${transcription}`);
+  postApi("/generate_text", { transcription });
 export const generateVideo = (
   text: string,
   avatar_id: string,
@@ -25,10 +25,12 @@ export const getInstagramVideos = (
 ) =>
   getApi(`/insta_videos?username=${username}&offset=${offset}&limit=${limit}`);
 export const getInstagramShortVideos = (
-    username: string,
-    offset: number,
-    limit: number
-  ) =>
-    getApi(`/insta_short_videos?username=${username}&offset=${offset}&limit=${limit}`);
+  username: string,
+  offset: number,
+  limit: number
+) =>
+  getApi(
+    `/insta_short_videos?username=${username}&offset=${offset}&limit=${limit}`
+  );
 export const getInstaTranscript = (url: string) =>
   getApi(`/insta_transcript?url=${url}`);
