@@ -1,9 +1,9 @@
 import { getApi, postApi } from "./apis";
 
-export const getVideos = (link: string, offset: number, limit: number) =>
-  getApi(`/videos?profile_url=${link}&offset=${offset}&limit=${limit}`);
-export const getShortVideos = (link: string, offset: number, limit: number) =>
-  getApi(`/short_videos?profile_url=${link}&offset=${offset}&limit=${limit}`);
+export const getVideos = (link: string) =>
+  getApi(`/videos?profile_url=${link}`);
+export const getShortVideos = (link: string) =>
+  getApi(`/short_videos?profile_url=${link}`);
 export const getTranscript = (video_id: string) =>
   getApi(`/transcript_video?video_id=${video_id}`);
 export const generateText = (transcription: string) =>
@@ -19,18 +19,14 @@ export const getTaskStatus = (taskId: string) => {
   return getApi(`/task_status/${taskId}`);
 };
 export const getInstagramVideos = (
-  username: string,
-  offset: number,
-  limit: number
+  username: string
 ) =>
-  getApi(`/insta_videos?username=${username}&offset=${offset}&limit=${limit}`);
+  getApi(`/insta_videos?username=${username}`);
 export const getInstagramShortVideos = (
-  username: string,
-  offset: number,
-  limit: number
+  username: string
 ) =>
   getApi(
-    `/insta_short_videos?username=${username}&offset=${offset}&limit=${limit}`
+    `/insta_short_videos?username=${username}`
   );
 export const getInstaTranscript = (url: string) =>
   getApi(`/insta_transcript?url=${url}`);

@@ -24,20 +24,21 @@ const formatNumber = (num: number): string => {
   return num.toString(); // Return as-is if less than 1000
 };
 
+const ITEMS_PER_LOAD = 5;
+
 export function Videos() {
   const navigate = useNavigate(); // Initialize the useNavigate hook
   const [searchParams] = useSearchParams(); // useSearchParams hook to get URL parameters
   const linkParam = searchParams.get("link"); // Get the "link" parameter from the URL
-  const [videos, setVideos] = useState<any[]>([]);
-  const [offset, setOffset] = useState(0);
+  const [allVideos, setAllVideos] = useState<any[]>([]);
+  const [visibleVideos, setVisibleVideos] = useState<any[]>([]);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState(true);
   const [showShorts, setShowShorts] = useState(false); // State for "Short" checkbox
 
   useEffect(() => {
     // Fetch initial videos on component mount
-    fetchVideos(0, showShorts);
+    fetchVideos(showShorts);
   }, [showShorts]);
 
   const getVideoType = () => {
@@ -65,21 +66,16 @@ export function Videos() {
     }
   };
 
-  const fetchVideos = (currentOffset: number, isShort: boolean) => {
+  const fetchVideos = (isShort: boolean) => {
     if (linkParam) {
       setLoading(true);
       if (getVideoType() === "Youtube") {
         const fetchFunction = isShort ? getShortVideos : getVideos; // Decide API to call
-        fetchFunction(linkParam, currentOffset, 5)
+        fetchFunction(linkParam)
           .then((res: any) => {
             if (res?.status === 200) {
-              setVideos((prevVideos) =>
-                currentOffset === 0
-                  ? res.data.videos
-                  : [...prevVideos, ...res.data.videos]
-              ); // Reset if fetching from 0
-              setOffset(res.data.next_offset || 0);
-              setHasMore(res.data.next_offset !== null);
+              setAllVideos(res.data.videos); // Store all videos
+              setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
             }
           })
           .catch((err: any) => {
@@ -89,17 +85,14 @@ export function Videos() {
             setLoading(false);
           });
       } else {
-        const fetchFunction = isShort ? getInstagramShortVideos : getInstagramVideos; // Decide API to call
-        fetchFunction(getInstagramUsername(linkParam), currentOffset, 5)
+        const fetchFunction = isShort
+          ? getInstagramShortVideos
+          : getInstagramVideos; // Decide API to call
+        fetchFunction(getInstagramUsername(linkParam))
           .then((res: any) => {
             if (res?.status === 200) {
-              setVideos((prevVideos) =>
-                currentOffset === 0
-                  ? res.data.videos
-                  : [...prevVideos, ...res.data.videos]
-              ); // Reset if fetching from 0
-              setOffset(res.data.next_offset || 0);
-              setHasMore(res.data.next_offset !== null);
+              setAllVideos(res.data.videos); // Store all videos
+              setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
             }
           })
           .catch((err: any) => {
@@ -118,12 +111,18 @@ export function Videos() {
 
   const openInstagramVideo = (url: string) => {
     window.open(url, "_blank");
-  }
+  };
 
   const handleLoadMore = () => {
-    if (hasMore) {
-      fetchVideos(offset, showShorts); // Fetch the next batch of videos
-    }
+    setLoading(true);
+    setTimeout(() => {
+      let nextIndex = visibleVideos.length + ITEMS_PER_LOAD;
+      if (nextIndex > allVideos.length) {
+        nextIndex = allVideos.length;
+      }
+      setVisibleVideos(allVideos.slice(0, nextIndex));
+      setLoading(false);
+    }, 500);
   };
 
   const handlePrev = () => {
@@ -132,11 +131,15 @@ export function Videos() {
 
   const handleNext = () => {
     if (selectedVideoIndex !== -1) {
-      const selectedVideo = videos[selectedVideoIndex];
-      if (getVideoType() === 'Youtube') {
+      const selectedVideo = visibleVideos[selectedVideoIndex];
+      if (getVideoType() === "Youtube") {
         navigate(`/scenarios?type=Youtube&ref=${selectedVideo["video_id"]}`);
       } else {
-        navigate(`/scenarios?type=Instagram&ref=${encodeURIComponent(selectedVideo["url"])}`);
+        navigate(
+          `/scenarios?type=Instagram&ref=${encodeURIComponent(
+            selectedVideo["url"]
+          )}`
+        );
       }
     } else {
       alert("Please select a video before proceeding.");
@@ -144,9 +147,9 @@ export function Videos() {
   };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setShowShorts(checked); // Update state for "Short" checkbox
-    setVideos([]); // Reset the videos list when toggling between short and normal videos
-    setOffset(0); // Reset the offset
+    setShowShorts(checked); // Update the checkbox state
+    setAllVideos([]); // Clear all videos
+    setVisibleVideos([]); // Clear visible videos
   };
 
   return (
@@ -167,7 +170,7 @@ export function Videos() {
 
         <div className="flex-1 min-h-0">
           <ScrollArea className="h-full w-full rounded-md border">
-            {videos.map((video, index) => (
+            {visibleVideos.map((video, index) => (
               <div
                 key={index}
                 className={`flex items-center gap-4 px-2 py-2 ${
@@ -176,7 +179,15 @@ export function Videos() {
                 onClick={(e) => setSelectedVideoIndex(index)}
               >
                 <img
-                  src={getVideoType() === 'Youtube' ? video.thumbnail:`${config.protocol}://${config.serverURL}/proxy-image?url=${encodeURIComponent(video.thumbnail)}`}
+                  src={
+                    getVideoType() === "Youtube"
+                      ? video.thumbnail
+                      : `${config.protocol}://${
+                          config.serverURL
+                        }/proxy-image?url=${encodeURIComponent(
+                          video.thumbnail
+                        )}`
+                  }
                   className="min-w-16 min-h-16 w-16 h-16 rounded-xl object-cover cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -199,7 +210,7 @@ export function Videos() {
             ))}
 
             {loading &&
-              Array.from({ length: 5 }).map((_, index) => (
+              Array.from({ length: ITEMS_PER_LOAD }).map((_, index) => (
                 <div
                   key={`skeleton-${index}`}
                   className="flex items-center gap-4 px-2 py-2 w-full"
@@ -220,7 +231,7 @@ export function Videos() {
           <Button
             className="w-40 self-center"
             onClick={handleLoadMore}
-            disabled={loading || !hasMore}
+            disabled={loading || allVideos.length === visibleVideos.length}
           >
             {loading ? "Loading..." : "Load More..."}
           </Button>

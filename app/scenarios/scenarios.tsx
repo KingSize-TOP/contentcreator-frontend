@@ -102,7 +102,7 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
             <div
               className={`${
                 selectedIndex === 0 ? "bg-[#666]" : "bg-[#eee]"
-              } h-40 px-4 py-2 flex items-center justify-center`}
+              } px-4 py-4 flex items-center justify-center cursor-pointer`}
               onClick={() => setSelectedIndex(0)}
             >
               {loading ? (
@@ -113,9 +113,9 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
               ) : (
                 // Show transcript when loading is complete
                 <Label
-                  className={`line-clamp-10 ${
+                  className={`${
                     selectedIndex === 0 ? "text-white" : "text-black"
-                  }`}
+                  } whitespace-pre-wrap`}
                 >
                   {transcript || "No transcript available"}
                 </Label>
@@ -133,7 +133,7 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
                 key={index}
                 className={`${
                   selectedIndex === index + 1 ? "bg-[#666]" : "bg-[#eee]"
-                } min-h-[160px] max-h-[320px] px-4 py-2 mt-4 flex items-center justify-center`}
+                } px-4 py-4 mt-4 flex items-center justify-center cursor-pointer`}
                 onClick={() => setSelectedIndex(index + 1)}
               >
                 {generating ? (
@@ -142,9 +142,9 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
                 ) : (
                   // Show generated text (if available) when done
                   <Label
-                    className={`line-clamp-10 ${
+                    className={`${
                       selectedIndex === index + 1 ? "text-white" : "text-black"
-                    }`}
+                    }  whitespace-pre-wrap`}
                   >
                     {generatedText[index] || "No text generated yet"}
                   </Label>
