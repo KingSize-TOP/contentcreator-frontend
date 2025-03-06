@@ -12,6 +12,7 @@ import {
   getShortVideos,
   getVideos,
 } from "~/services/services";
+import { Toaster, toast } from "sonner";
 
 // Utility function to format numbers
 const formatNumber = (num: number): string => {
@@ -130,7 +131,7 @@ export function Videos() {
             }
           })
           .catch((err: any) => {
-            console.log("Error fetching videos:", err);
+            toast.error("Oops. An error occurred while retrieving the video. Please try again.");
           })
           .finally(() => {
             setLoading(false);
@@ -179,7 +180,7 @@ export function Videos() {
             }
           })
           .catch((err: any) => {
-            console.log("Error fetching videos:", err);
+            toast.error("Oops. An error occurred while retrieving the video. Please try again.");
           })
           .finally(() => {
             setLoading(false);
@@ -225,7 +226,7 @@ export function Videos() {
         );
       }
     } else {
-      alert("Please select a video before proceeding.");
+      toast.error("Please select a video before proceeding.");
     }
   };
 
@@ -332,6 +333,7 @@ export function Videos() {
           </Button>
         </div>
       </div>
+      <Toaster position="bottom-center" richColors />
     </main>
   );
 }

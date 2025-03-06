@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { Toaster, toast } from "sonner";
 
 export function Home() {
   const [profileLink, setProfileLink] = useState<string>("");
@@ -84,10 +85,12 @@ export function Home() {
         if (!profileLinks.includes(normalizedLink)) {
           setProfileLinks((prev) => [...prev, normalizedLink]); // Add only if it's not already in the list
         } else {
-          alert("This profile link is already in the list.");
+          toast.error("This profile link is already in the list.");
+          // alert("This profile link is already in the list.");
         }
       } else {
-        alert("Invalid YouTube profile link. Please check and try again.");
+        toast.error("Invalid YouTube profile link. Please check and try again.");
+        // alert("Invalid YouTube profile link. Please check and try again.");
       }
       setProfileLink(""); // Clear the input field after adding
     }
@@ -112,7 +115,8 @@ export function Home() {
         navigate(`/videos?link=${encodeURIComponent(selectedLink)}`);
       }
     } else {
-      alert("Please select a link before proceeding.");
+      toast.error("Please select a link before proceeding.");
+      // alert("Please select a link before proceeding.");
     }
   };
 
@@ -163,6 +167,7 @@ export function Home() {
           </Button>
         </div>
       </div>
+      <Toaster position="bottom-center" richColors />
     </main>
   );
 }

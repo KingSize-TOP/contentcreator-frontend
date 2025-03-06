@@ -8,6 +8,7 @@ import {
   getInstaTranscript,
   getTranscript,
 } from "~/services/services";
+import { Toaster, toast } from "sonner";
 
 export function Scenarios() {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -31,6 +32,7 @@ export function Scenarios() {
             }
           })
           .catch((err: any) => {
+            toast.error("Oops. An error occurred while getting the transcript. Please try again.");
             console.log("Error");
           })
           .finally(() => {
@@ -47,6 +49,7 @@ export function Scenarios() {
             }
           })
           .catch((err: any) => {
+            toast.error("Oops. An error occurred while getting the transcript. Please try again.");
             console.log("Error");
           })
           .finally(() => {
@@ -66,6 +69,7 @@ export function Scenarios() {
           }
         })
         .catch((err: any) => {
+          toast.error("Oops. An error occurred while generating the text. Please try again.");
           console.log("Error");
         })
         .finally(() => {
@@ -87,7 +91,7 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
           : generatedText[selectedIndex - 1];
       navigate(`/avatar?transcript=${encodeURIComponent(selectedTranscript)}`);
     } else {
-      alert("Please select a transcript before proceeding.");
+      toast.error("Please select a transcript before proceeding.");
     }
   };
 
@@ -166,6 +170,7 @@ Back inside, I have super veggie which is a few pounds of broccoli, cauliflower,
           </Button>
         </div>
       </div>
+      <Toaster position="bottom-center" richColors />
     </main>
   );
 }

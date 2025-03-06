@@ -9,6 +9,7 @@ import {
   getTaskStatus,
   getVoiceList,
 } from "~/services/services";
+import { Toaster, toast } from "sonner";
 
 export function Avatar() {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -37,6 +38,8 @@ export function Avatar() {
   const [showCaption, setShowCaption] = useState<boolean>(false);
   const [orientation, setOrientation] = useState<string>("landscape");
 
+  let pollingInterval: NodeJS.Timeout;
+
   useEffect(() => {
     // Set loading to true whenever fetching starts
     setIsLoading(true);
@@ -53,6 +56,9 @@ export function Avatar() {
           }
         })
         .catch((err: any) => {
+          toast.error(
+            "Oops! An error occured while fetching avatars. Please try again later."
+          );
           console.error("Error fetching avatars");
         }),
 
@@ -73,6 +79,9 @@ export function Avatar() {
           }
         })
         .catch((err: any) => {
+          toast.error(
+            "Oops! An error occured while fetching voices. Please try again later."
+          );
           console.error("Error fetching voices");
         }),
     ]).finally(() => {
@@ -100,10 +109,22 @@ export function Avatar() {
 
   const handleGenerateAvatar = () => {
     if (!selectedAvatarId || !selectedVoiceId || !transcript) {
-      alert("Please select an avatar and a voice!");
+      toast.error("Please select an avatar and a voice!");
       return;
     }
     setIsGenerating(true);
+
+    const timeoutId = setTimeout(() => {
+      if (isGenerating) {
+        // Check if still generating
+        toast.error(
+          "Avatar generation is taking too long. Please try again later."
+        );
+        setIsGenerating(false); // Stop the generating state
+        clearInterval(pollingInterval); // Stop polling if it's still active
+      }
+    }, 600000); // 10 minutes in milliseconds
+
     generateVideo(
       transcript,
       selectedAvatarId,
@@ -114,32 +135,39 @@ export function Avatar() {
       .then((res: any) => {
         console.log(res);
         const taskId = res.data.task_id;
-        pollTaskStatus(taskId);
+        pollingInterval = pollTaskStatus(taskId);
       })
       .catch((err: any) => {
         console.error("Error starting video generation:", err);
-        alert("Failed to start video generation.");
+        toast.error(
+          "Oops! Failed to start avatar generation! Please try again later."
+        );
         setIsGenerating(false);
       });
   };
 
   const pollTaskStatus = (taskId: string) => {
-    const interval = setInterval(() => {
+    return setInterval(() => {
       getTaskStatus(taskId)
         .then((statusRes: any) => {
           if (statusRes.data.status === "completed") {
             setGeneratedVideoUrl(statusRes.data.video_url); // Video is ready
-            clearInterval(interval);
+            clearInterval(pollingInterval);
             setIsGenerating(false);
           } else if (statusRes.data.status === "failed") {
-            alert(`Video generation failed: ${statusRes.data.error}`);
-            clearInterval(interval);
+            toast.error(
+              "Oops! Avatar generation is failed! Please try again later."
+            );
+            clearInterval(pollingInterval);
             setIsGenerating(false);
           }
         })
         .catch((err: any) => {
+          toast.error(
+            "Oops! An error occured during avatar generation. Please try again later."
+          );
           console.error("Error checking task status:", err);
-          clearInterval(interval);
+          clearInterval(pollingInterval);
           setIsGenerating(false);
         });
     }, 5000); // Poll every 5 seconds
@@ -383,6 +411,7 @@ export function Avatar() {
           </Button>
         </div>
       </div>
+      <Toaster position="bottom-center" richColors />
     </main>
   );
 }
