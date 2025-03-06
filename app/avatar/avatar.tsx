@@ -128,6 +128,7 @@ export function Avatar() {
       getTaskStatus(taskId)
         .then((statusRes: any) => {
           if (statusRes.data.status === "completed") {
+            console.log(statusRes.data);
             if (showCaption) {
               setGeneratedVideoUrl(statusRes.data.video_url_caption); // Video is ready
             } else {
