@@ -32,7 +32,9 @@ export function Scenarios() {
             }
           })
           .catch((err: any) => {
-            toast.error("Oops. An error occurred while getting the transcript. Please try again.");
+            toast.error(
+              "Oops. An error occurred while getting the transcript. Please try again."
+            );
             console.log("Error");
           })
           .finally(() => {
@@ -49,7 +51,9 @@ export function Scenarios() {
             }
           })
           .catch((err: any) => {
-            toast.error("Oops. An error occurred while getting the transcript. Please try again.");
+            toast.error(
+              "Oops. An error occurred while getting the transcript. Please try again."
+            );
             console.log("Error");
           })
           .finally(() => {
@@ -69,7 +73,9 @@ export function Scenarios() {
           }
         })
         .catch((err: any) => {
-          toast.error("Oops. An error occurred while generating the text. Please try again.");
+          toast.error(
+            "Oops. An error occurred while generating the text. Please try again."
+          );
           console.log("Error");
         })
         .finally(() => {
@@ -85,10 +91,7 @@ export function Scenarios() {
   const handleNext = () => {
     if (selectedIndex !== -1) {
       const selectedTranscript =
-        selectedIndex === 0
-          ? `I've been spending millions of dollars trying to create the perfect diet. What I did is I asked all my organs of the body. Hey, heart liver and kidney, what do you need to be your best self? We looked at scientific evidence and this is the result a diet. Exactly mapped to produce 50, perfect biomarkers. My speed of Aging is currently slower than the average 10 year old. So let me show you what I do on a daily basis. When I wake up in the morning, I drink the Green Giant collagen peptides, cinnamon spermidine via chlorella powder. Amino acids, 57 pills. I didn't work out for 1 hour. I come back.
-Back inside, I have super veggie which is a few pounds of broccoli, cauliflower, mushrooms, black lentils, ginger and garlic extra virgin olive oil. I have a very special type and 100% dark chocolate, which is bitter. And I pair this with the vegetables 1 hour, later nutty pudding, which is macadamia nuts. Walnuts flax seeds, berries, sunflower lechin, pea protein, an additional roughly 40 pills. I'll have a third meal of the day which includes vegetables, berries and nuts. And some more olive. Oil altogether is 2,000 calories.`
-          : generatedText[selectedIndex - 1];
+        selectedIndex === 0 ? transcript : generatedText[selectedIndex - 1];
       navigate(`/avatar?transcript=${encodeURIComponent(selectedTranscript)}`);
     } else {
       toast.error("Please select a transcript before proceeding.");
