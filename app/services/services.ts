@@ -11,8 +11,10 @@ export const generateText = (transcription: string) =>
 export const generateVideo = (
   text: string,
   avatar_id: string,
-  voice_id: string
-) => postApi("/generate_video", { text, avatar_id, voice_id });
+  voice_id: string,
+  caption: boolean,
+  portrait: boolean
+) => postApi("/generate_video", { text, avatar_id, voice_id, caption, portrait });
 export const getAvatarList = () => getApi("/avatar_list");
 export const getVoiceList = () => getApi("/voice_list");
 export const getTaskStatus = (taskId: string) => {

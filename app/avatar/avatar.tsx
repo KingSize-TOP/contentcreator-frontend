@@ -33,6 +33,10 @@ export function Avatar() {
   const [languageFilter, setLanguageFilter] = useState<string>("all");
   const [genderFilter, setGenderFilter] = useState<string>("all");
 
+  // New state variables for caption and orientation
+  const [showCaption, setShowCaption] = useState<boolean>(false);
+  const [orientation, setOrientation] = useState<string>("portrait");
+
   useEffect(() => {
     // Set loading to true whenever fetching starts
     setIsLoading(true);
@@ -100,7 +104,13 @@ export function Avatar() {
       return;
     }
     setIsGenerating(true);
-    generateVideo(transcript, selectedAvatarId, selectedVoiceId)
+    generateVideo(
+      transcript,
+      selectedAvatarId,
+      selectedVoiceId,
+      showCaption,
+      orientation === "portrait"
+    )
       .then((res: any) => {
         console.log(res);
         const taskId = res.data.task_id;
@@ -308,6 +318,28 @@ export function Avatar() {
                   </div>
                 ))}
               </div>
+            </div>
+            {/* Show Caption Selection */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={showCaption}
+                onChange={(e) => setShowCaption(e.target.checked)}
+                className="mr-2"
+              />
+              <Label>Show Caption</Label>
+            </div>
+
+            {/* Orientation Selection */}
+            <div className="flex gap-4 mb-3">
+              <select
+                value={orientation}
+                onChange={(e) => setOrientation(e.target.value)}
+                className="p-2 border rounded"
+              >
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
             </div>
           </>
         )}
