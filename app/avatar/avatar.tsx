@@ -319,26 +319,25 @@ export function Avatar() {
                 ))}
               </div>
             </div>
-            {/* Show Caption Selection */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={showCaption}
-                onChange={(e) => setShowCaption(e.target.checked)}
-                className="mr-2"
-              />
-              <Label>Show Caption</Label>
-            </div>
 
-            {/* Orientation Selection */}
-            <div className="flex gap-4 mb-3">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={showCaption}
+                  onChange={(e) => setShowCaption(e.target.checked)}
+                  className="mr-2"
+                />
+                <Label>Show Caption</Label>
+              </div>
+
               <select
                 value={orientation}
                 onChange={(e) => setOrientation(e.target.value)}
                 className="p-2 border rounded"
               >
-                <option value="landscape">Landscape</option>
                 <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
               </select>
             </div>
           </>
