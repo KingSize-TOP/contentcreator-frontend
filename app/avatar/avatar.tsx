@@ -128,7 +128,11 @@ export function Avatar() {
       getTaskStatus(taskId)
         .then((statusRes: any) => {
           if (statusRes.data.status === "completed") {
-            setGeneratedVideoUrl(statusRes.data.video_url); // Video is ready
+            if (showCaption) {
+              setGeneratedVideoUrl(statusRes.data.video_url_caption); // Video is ready
+            } else {
+              setGeneratedVideoUrl(statusRes.data.video_url); // Video is ready
+            }
             clearInterval(interval);
             setIsGenerating(false);
           } else if (statusRes.data.status === "failed") {

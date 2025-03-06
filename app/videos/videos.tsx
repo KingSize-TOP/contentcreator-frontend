@@ -47,16 +47,17 @@ export function Videos() {
       const threeDaysInMs = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
       if (currentDate.getTime() > expiryDate.getTime() + threeDaysInMs) {
         // Remove expired data from localStorage
-        localStorage.removeItem(linkParam!);
-        localStorage.removeItem(linkParam + "_expiry_time");
+        fetchVideos(showShorts);
       } else {
         // If the cache is still valid, use it
-        setAllVideos(JSON.parse(cacheVideos));
-        setVisibleVideos(JSON.parse(cacheVideos).slice(0, ITEMS_PER_LOAD));
+        const videos = JSON.parse(cacheVideos);
+        setAllVideos(videos);
+        setVisibleVideos(videos.slice(0, ITEMS_PER_LOAD));
         return; // Skip fetching new videos
       }
+    } else {
+      fetchVideos(showShorts);
     }
-    fetchVideos(showShorts);
   }, [showShorts]);
 
   const getVideoType = () => {
@@ -92,9 +93,36 @@ export function Videos() {
         fetchFunction(linkParam)
           .then((res: any) => {
             if (res?.status === 200) {
-              setAllVideos(res.data.videos); // Store all videos
-              setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
-              localStorage.setItem(linkParam, JSON.stringify(res.data.videos));
+              const newVideos = res.data.videos; // Get new videos
+              const existingVideos = JSON.parse(
+                localStorage.getItem(linkParam) || "[]"
+              ); // Retrieve existing videos
+
+              // Combine existing and new videos without duplicates
+              const combinedVideos = [
+                ...existingVideos,
+                ...newVideos.filter(
+                  (newVideo: any) =>
+                    !existingVideos.some(
+                      (existingVideo: any) =>
+                        existingVideo.video_id === newVideo.video_id
+                    )
+                ),
+              ];
+
+              // Sort combined videos by views and likes
+              combinedVideos.sort((a: any, b: any) => {
+                // First sort by views (descending)
+                if (b.views !== a.views) {
+                  return b.views - a.views;
+                }
+                // If views are equal, sort by likes (descending)
+                return b.likes - a.likes;
+              });
+
+              setAllVideos(combinedVideos); // Store all videos
+              setVisibleVideos(combinedVideos.slice(0, ITEMS_PER_LOAD)); // Set visible videos
+              localStorage.setItem(linkParam, JSON.stringify(combinedVideos)); // Update localStorage
               localStorage.setItem(
                 linkParam + "_expiry_time",
                 new Date().toLocaleString()
@@ -114,9 +142,36 @@ export function Videos() {
         fetchFunction(getInstagramUsername(linkParam))
           .then((res: any) => {
             if (res?.status === 200) {
-              setAllVideos(res.data.videos); // Store all videos
-              setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
-              localStorage.setItem(linkParam, JSON.stringify(res.data.videos));
+              const newVideos = res.data.videos; // Get new videos
+              const existingVideos = JSON.parse(
+                localStorage.getItem(linkParam) || "[]"
+              ); // Retrieve existing videos
+
+              // Combine existing and new videos without duplicates
+              const combinedVideos = [
+                ...existingVideos,
+                ...newVideos.filter(
+                  (newVideo: any) =>
+                    !existingVideos.some(
+                      (existingVideo: any) =>
+                        existingVideo.video_id === newVideo.video_id
+                    )
+                ),
+              ];
+
+              // Sort combined videos by views and likes
+              combinedVideos.sort((a: any, b: any) => {
+                // First sort by views (descending)
+                if (b.views !== a.views) {
+                  return b.views - a.views;
+                }
+                // If views are equal, sort by likes (descending)
+                return b.likes - a.likes;
+              });
+
+              setAllVideos(combinedVideos); // Store all videos
+              setVisibleVideos(combinedVideos.slice(0, ITEMS_PER_LOAD)); // Set visible videos
+              localStorage.setItem(linkParam, JSON.stringify(combinedVideos)); // Update localStorage
               localStorage.setItem(
                 linkParam + "_expiry_time",
                 new Date().toLocaleString()
