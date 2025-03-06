@@ -38,6 +38,24 @@ export function Videos() {
 
   useEffect(() => {
     // Fetch initial videos on component mount
+    const cacheVideos = localStorage.getItem(linkParam!);
+    const expiryTime = localStorage.getItem(linkParam + "_expiry_time");
+    if (cacheVideos && expiryTime) {
+      const expiryDate = new Date(expiryTime);
+      const currentDate = new Date();
+
+      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+      if (currentDate.getTime() > expiryDate.getTime() + threeDaysInMs) {
+        // Remove expired data from localStorage
+        localStorage.removeItem(linkParam!);
+        localStorage.removeItem(linkParam + "_expiry_time");
+      } else {
+        // If the cache is still valid, use it
+        setAllVideos(JSON.parse(cacheVideos));
+        setVisibleVideos(JSON.parse(cacheVideos).slice(0, ITEMS_PER_LOAD));
+        return; // Skip fetching new videos
+      }
+    }
     fetchVideos(showShorts);
   }, [showShorts]);
 
@@ -76,6 +94,11 @@ export function Videos() {
             if (res?.status === 200) {
               setAllVideos(res.data.videos); // Store all videos
               setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
+              localStorage.setItem(linkParam, JSON.stringify(res.data.videos));
+              localStorage.setItem(
+                linkParam + "_expiry_time",
+                new Date().toLocaleString()
+              );
             }
           })
           .catch((err: any) => {
@@ -93,6 +116,11 @@ export function Videos() {
             if (res?.status === 200) {
               setAllVideos(res.data.videos); // Store all videos
               setVisibleVideos(res.data.videos.slice(0, ITEMS_PER_LOAD));
+              localStorage.setItem(linkParam, JSON.stringify(res.data.videos));
+              localStorage.setItem(
+                linkParam + "_expiry_time",
+                new Date().toLocaleString()
+              );
             }
           })
           .catch((err: any) => {
