@@ -324,11 +324,12 @@ export function Avatar() {
               <div className="flex items-center">
                 <input
                   type="checkbox"
+                  id="show-caption"
                   checked={showCaption}
                   onChange={(e) => setShowCaption(e.target.checked)}
                   className="mr-2"
                 />
-                <Label>Show Caption</Label>
+                <Label htmlFor="show-caption">Show Caption</Label>
               </div>
 
               <select
