@@ -35,7 +35,7 @@ export function Avatar() {
 
   // New state variables for caption and orientation
   const [showCaption, setShowCaption] = useState<boolean>(false);
-  const [orientation, setOrientation] = useState<string>("portrait");
+  const [orientation, setOrientation] = useState<string>("landscape");
 
   useEffect(() => {
     // Set loading to true whenever fetching starts
@@ -337,8 +337,8 @@ export function Avatar() {
                 onChange={(e) => setOrientation(e.target.value)}
                 className="p-2 border rounded"
               >
-                <option value="portrait">Portrait</option>
                 <option value="landscape">Landscape</option>
+                <option value="portrait">Portrait</option>
               </select>
             </div>
           </>
