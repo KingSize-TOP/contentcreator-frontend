@@ -265,55 +265,60 @@ export function Avatar() {
             <div className="mt-4">
               <Label className="text-lg">Avatars</Label>
               <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-                {(avatarType === "public" ? avatarList : ugcAvatarList).map(
-                  (avatar: any) => (
-                    <div
-                      key={avatar.avatar_id}
-                      className={`flex flex-col gap-2 p-2 border-b ${
-                        selectedAvatarId === avatar.avatar_id
-                          ? "bg-gray-200" // Highlight the selected avatar
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Click on the image to play video */}
-                        <img
-                          src={avatar.preview_image_url}
-                          alt={avatar.avatar_name}
-                          className="w-12 h-12 rounded-md cursor-pointer"
-                          onClick={() =>
-                            handleAvatarClick(avatar.avatar_id, true)
-                          }
-                        />
-                        {/* Click elsewhere to select the avatar */}
-                        <div
-                          className="flex flex-col flex-1 cursor-pointer"
-                          onClick={() =>
-                            handleAvatarClick(avatar.avatar_id, false)
-                          }
-                        >
-                          <span className="font-semibold">
-                            {avatar.avatar_name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {avatar.gender}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* ReactPlayer to play video */}
-                      {playingVideoId === avatar.avatar_id && (
-                        <div className="mt-2">
-                          <ReactPlayer
-                            url={avatar.preview_video_url}
-                            controls
-                            playing
-                            width="100%"
-                            height="200px"
+                {(avatarType === "public" ? avatarList : ugcAvatarList)
+                  .length === 0 ? ( // Check if there are no avatars
+                  <p className="text-center text-gray-500">No avatars</p> // Message when no avatars are available
+                ) : (
+                  (avatarType === "public" ? avatarList : ugcAvatarList).map(
+                    (avatar: any) => (
+                      <div
+                        key={avatar.avatar_id}
+                        className={`flex flex-col gap-2 p-2 border-b ${
+                          selectedAvatarId === avatar.avatar_id
+                            ? "bg-gray-200" // Highlight the selected avatar
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Click on the image to play video */}
+                          <img
+                            src={avatar.preview_image_url}
+                            alt={avatar.avatar_name}
+                            className="w-12 h-12 rounded-md cursor-pointer"
+                            onClick={() =>
+                              handleAvatarClick(avatar.avatar_id, true)
+                            }
                           />
+                          {/* Click elsewhere to select the avatar */}
+                          <div
+                            className="flex flex-col flex-1 cursor-pointer"
+                            onClick={() =>
+                              handleAvatarClick(avatar.avatar_id, false)
+                            }
+                          >
+                            <span className="font-semibold">
+                              {avatar.avatar_name}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {avatar.gender}
+                            </span>
+                          </div>
                         </div>
-                      )}
-                    </div>
+
+                        {/* ReactPlayer to play video */}
+                        {playingVideoId === avatar.avatar_id && (
+                          <div className="mt-2">
+                            <ReactPlayer
+                              url={avatar.preview_video_url}
+                              controls
+                              playing
+                              width="100%"
+                              height="200px"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )
                   )
                 )}
               </div>
