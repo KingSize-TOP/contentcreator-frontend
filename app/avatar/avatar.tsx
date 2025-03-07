@@ -224,7 +224,7 @@ export function Avatar() {
 
   const handleDownload = () => {
     if (generatedVideoUrl) {
-      downloadVideo(generatedVideoUrl)
+      downloadVideo(encodeURIComponent(generatedVideoUrl))
         .then((res: any) => {
           console.log(res);
         })
