@@ -16,6 +16,7 @@ export const generateVideo = (
   portrait: boolean
 ) => postApi("/generate_video", { text, avatar_id, voice_id, caption, portrait });
 export const getAvatarList = () => getApi("/avatar_list");
+export const getUGCAvatarList = () => getApi("/ugc_avatar_list");
 export const getVoiceList = () => getApi("/voice_list");
 export const getTaskStatus = (taskId: string) => {
   return getApi(`/task_status/${taskId}`);

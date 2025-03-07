@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router";
+import { Toaster, toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import {
   generateVideo,
   getAvatarList,
   getTaskStatus,
+  getUGCAvatarList,
   getVoiceList,
 } from "~/services/services";
-import { Toaster, toast } from "sonner";
 
 export function Avatar() {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -17,6 +18,7 @@ export function Avatar() {
   const transcript = searchParams.get("transcript");
 
   const [avatarList, setAvatarList] = useState([]);
+  const [ugcAvatarList, setUGCAvatarList] = useState([]);
   const [voiceList, setVoiceList] = useState([]);
   const [filteredVoiceList, setFilteredVoiceList] = useState([]); // Filtered list of voices
   const [isLoading, setIsLoading] = useState(true); // Loading while fetching avatars/voices
@@ -37,6 +39,7 @@ export function Avatar() {
   // New state variables for caption and orientation
   const [showCaption, setShowCaption] = useState<boolean>(false);
   const [orientation, setOrientation] = useState<string>("landscape");
+  const [avatarType, setAvatarType] = useState<string>("public"); // State for avatar type
 
   let pollingInterval: NodeJS.Timeout;
 
@@ -53,6 +56,19 @@ export function Avatar() {
               (avatar: any) => avatar.gender !== "unknown"
             );
             setAvatarList(filteredAvatars);
+          }
+        })
+        .catch((err: any) => {
+          toast.error(
+            "Oops! An error occured while fetching avatars. Please try again later."
+          );
+          console.error("Error fetching avatars");
+        }),
+
+      getUGCAvatarList()
+        .then((res: any) => {
+          if (res?.status === 200) {
+            setUGCAvatarList(res.data);
           }
         })
         .catch((err: any) => {
@@ -106,6 +122,10 @@ export function Avatar() {
 
     setFilteredVoiceList(filtered);
   }, [languageFilter, genderFilter, voiceList]);
+
+  const handleAvatarTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setAvatarType(e.target.value); // Update the avatar type based on user selection
+  };
 
   const handleGenerateAvatar = () => {
     if (!selectedAvatarId || !selectedVoiceId || !transcript) {
@@ -208,6 +228,18 @@ export function Avatar() {
       <div className="flex flex-col gap-4 min-h-0 w-full h-full px-4">
         {/* Input Section */}
         <Label className="self-center text-2xl">Avatar</Label>
+        {/* Avatar Type Selection */}
+        <div className="flex items-center mb-4">
+          <Label className="mr-2">Select Avatar Type:</Label>
+          <select
+            value={avatarType}
+            onChange={handleAvatarTypeChange}
+            className="p-2 border rounded"
+          >
+            <option value="public">Public</option>
+            <option value="user_created">User Created</option>
+          </select>
+        </div>
         {/* Show Loading Spinner or Message */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full">
@@ -220,55 +252,57 @@ export function Avatar() {
             <div className="mt-4">
               <Label className="text-lg">Avatars</Label>
               <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-                {avatarList.map((avatar: any) => (
-                  <div
-                    key={avatar.avatar_id}
-                    className={`flex flex-col gap-2 p-2 border-b ${
-                      selectedAvatarId === avatar.avatar_id
-                        ? "bg-gray-200" // Highlight the selected avatar
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Click on the image to play video */}
-                      <img
-                        src={avatar.preview_image_url}
-                        alt={avatar.avatar_name}
-                        className="w-12 h-12 rounded-md cursor-pointer"
-                        onClick={() =>
-                          handleAvatarClick(avatar.avatar_id, true)
-                        }
-                      />
-                      {/* Click elsewhere to select the avatar */}
-                      <div
-                        className="flex flex-col flex-1 cursor-pointer"
-                        onClick={() =>
-                          handleAvatarClick(avatar.avatar_id, false)
-                        }
-                      >
-                        <span className="font-semibold">
-                          {avatar.avatar_name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {avatar.gender}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* ReactPlayer to play video */}
-                    {playingVideoId === avatar.avatar_id && (
-                      <div className="mt-2">
-                        <ReactPlayer
-                          url={avatar.preview_video_url}
-                          controls
-                          playing
-                          width="100%"
-                          height="200px"
+                {(avatarType === "public" ? avatarList : ugcAvatarList).map(
+                  (avatar: any) => (
+                    <div
+                      key={avatar.avatar_id}
+                      className={`flex flex-col gap-2 p-2 border-b ${
+                        selectedAvatarId === avatar.avatar_id
+                          ? "bg-gray-200" // Highlight the selected avatar
+                          : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* Click on the image to play video */}
+                        <img
+                          src={avatar.preview_image_url}
+                          alt={avatar.avatar_name}
+                          className="w-12 h-12 rounded-md cursor-pointer"
+                          onClick={() =>
+                            handleAvatarClick(avatar.avatar_id, true)
+                          }
                         />
+                        {/* Click elsewhere to select the avatar */}
+                        <div
+                          className="flex flex-col flex-1 cursor-pointer"
+                          onClick={() =>
+                            handleAvatarClick(avatar.avatar_id, false)
+                          }
+                        >
+                          <span className="font-semibold">
+                            {avatar.avatar_name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {avatar.gender}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* ReactPlayer to play video */}
+                      {playingVideoId === avatar.avatar_id && (
+                        <div className="mt-2">
+                          <ReactPlayer
+                            url={avatar.preview_video_url}
+                            controls
+                            playing
+                            width="100%"
+                            height="200px"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
               </div>
             </div>
 
