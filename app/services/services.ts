@@ -33,3 +33,6 @@ export const getInstagramShortVideos = (
   );
 export const getInstaTranscript = (url: string) =>
   getApi(`/insta_transcript?url=${url}`);
+
+export const downloadVideo = (video_url: string) =>
+  getApi(`/download_video?video_url=${video_url}`);

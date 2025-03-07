@@ -5,6 +5,7 @@ import { Toaster, toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import {
+  downloadVideo,
   generateVideo,
   getAvatarList,
   getTaskStatus,
@@ -221,7 +222,19 @@ export function Avatar() {
     navigate(-1);
   };
 
-  const handleNext = () => {};
+  const handleDownload = () => {
+    if (generatedVideoUrl) {
+      downloadVideo(generatedVideoUrl)
+        .then((res: any) => {
+          console.log(res);
+        })
+        .catch((err: any) => {
+          toast.error(
+            "Oops! Failed to download video! Please try again later."
+          );
+        });
+    }
+  };
 
   return (
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
@@ -440,8 +453,8 @@ export function Avatar() {
           </Button>
 
           {/* Next Button */}
-          <Button className="flex-1" onClick={handleNext}>
-            Next
+          <Button className="flex-1" onClick={handleDownload}>
+            Download
           </Button>
         </div>
       </div>
