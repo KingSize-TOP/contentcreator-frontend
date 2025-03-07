@@ -224,15 +224,15 @@ export function Avatar() {
 
   const handleDownload = () => {
     if (generatedVideoUrl) {
-      downloadVideo(encodeURIComponent(generatedVideoUrl))
-        .then((res: any) => {
-          console.log(res);
-        })
-        .catch((err: any) => {
-          toast.error(
-            "Oops! Failed to download video! Please try again later."
-          );
-        });
+      const link = document.createElement("a");
+      link.href = generatedVideoUrl; // Set the video URL
+      link.download = "generated_video.mp4"; // Default file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Video download started!");
+    } else {
+      toast.error("No video is available for download!");
     }
   };
 
