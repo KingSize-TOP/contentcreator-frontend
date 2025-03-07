@@ -122,7 +122,7 @@ export function Home() {
 
   return (
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
-      <div className="flex flex-col gap-4 min-h-0 max-w-[360px] h-full">
+      <div className="flex flex-col gap-4 min-h-0 max-w-md h-full">
         {/* Input Section */}
         <Label className="self-center text-2xl">Links</Label>
         <div className="flex gap-2">

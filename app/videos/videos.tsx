@@ -238,7 +238,7 @@ export function Videos() {
 
   return (
     <main className="flex items-center justify-center pt-10 pb-4 h-screen">
-      <div className="flex flex-col gap-4 min-h-0 w-full h-full px-3">
+      <div className="flex flex-col gap-4 min-h-0 max-w-md w-full h-full px-3">
         {/* Input Section */}
         <Label className="self-center text-2xl">Videos</Label>
 
